@@ -1,0 +1,95 @@
+
+
+
+
+
+{{>admin-side}}
+
+    <main class="main-wrap">
+        <section class="content-main" style="height: auto;">
+          <form action="/admin/add-product" method="post" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-6">
+                  
+                      <div class="content-header">
+                        <h2 class="content-title">Add New Product</h2>
+                        <div>
+                            <button class="btn btn-md rounded font-sm hover-up" type="submit">Publish Product</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>1. General info</h6>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="mb-4">
+                                        <label class="form-label">Product Name</label>
+                                        <input type="text" placeholder="Type here" class="form-control" name="product_name">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Description</label>
+                                        <textarea placeholder="Type here" class="form-control" rows="3" name="product_description"></textarea>
+                                    </div>
+                                    {{!-- <div class="mb-4">
+                                        <label class="form-label">Brand name</label>
+                                        <select class="form-select">
+                                            <option> Adidas </option>
+                                            <option> Nike </option>
+                                            <option> Puma </option>
+                                        </select>
+                                    </div> --}}
+                                </div> <!-- col.// -->
+                            </div> <!-- row.// -->
+                            <hr class="mb-4 mt-0">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>2. Pricing</h6>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="mb-4">
+                                        <label class="form-label">Cost in INR</label>
+                                        <input type="text" placeholder="₹00.0" class="form-control" name="price">
+                                    </div>
+                                </div> <!-- col.// -->
+                            </div> <!-- row.// -->
+                            <hr class="mb-4 mt-0">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>3. Category</h6>
+                                </div>
+                                <div class="col-md-9 " style="margin-bottom: 40px;">
+                                    <div class="mb-0">
+                                        <select class="form-select" name="category_name">
+                                        {{#each category}}
+                                            <option> {{this.category_name}} </option>
+                                        {{/each}}
+                                        </select>
+                                    </div>
+                                </div> <!-- col.// -->
+                            </div> <!-- row.// -->
+                            <hr class="mb-4 mt-0">
+                            <div class="row mt-5">
+                                <div class="col-md-3 mt-3">
+                                    <h6>4. Media</h6>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="mb-4">
+                                        <label class="form-label">Images</label>
+                                        <input class="form-control" type="file" multiple name="images" value="upload">
+                                    </div>
+                                </div> <!-- col.// -->
+                            </div> <!-- .row end// -->
+                        </div>
+                    </div>
+                </div>
+             </div>
+            </div>
+         </form>
+        </section> <!-- content-main end// -->
+      </main>

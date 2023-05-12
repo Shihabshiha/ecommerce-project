@@ -1,0 +1,326 @@
+  <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/" rel="nofollow">Home</a>
+                    <span></span> Shop
+                    <span></span> Checkout
+                </div>
+            </div>
+        </div>
+        <section class="mt-50 mb-50">
+            <div class="container">
+            <div class="row">                
+                <div class="col-lg-6">
+                    <div class="toggle_info">
+                    <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your code</a></span>
+                    </div>
+                    <div class="panel-collapse collapse coupon_form " id="coupon">
+                        <div class="panel-body">
+                            <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
+                            <form method="post" id="coupon-form">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Enter Coupon Code..." name="couponCode">
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn  btn-md" name="login">Apply Coupon</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div id="coupon-list">                       
+                        <div id="coupon-template" type="text/x-handlebars-template">
+                            {{#if coupons}}
+                            <h4>Available Coupons:</h4>
+                            <ul>
+                            {{#each coupons}}
+                            <li>
+                                <span class="coupon-code">{{inc @index}} -{{this.code}}</span> - {{this.discountPercentage}}% off on purchase above {{this.requiredMinPurchaseLimit}}
+                                <div style="display:inline-block;vertical-align:middle;margin-left:5px;cursor:pointer;" class="copy-coupon" data-coupon="{{this.code}}">
+                                <i class="fa fa-copy"></i><span style="display:none;">Copied!</span>
+                                </div>
+                            </li>
+                            {{/each}}
+                            </ul>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                    <div class="col-12">
+                        <div class="divider mt-50 mb-50"></div>
+                    </div>
+            </div>
+            <div class="row" >
+                
+                    <div class="col-md-6" >
+                        <div class="mb-25">
+                            <h4>Billing Details</h4>
+                        </div>
+                        
+                        <div class="card mb-3 mb-lg-0">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Billing Address</h5>
+                                </div>
+                                
+                                <div class="list-group">
+                                 <form id="address-form">
+                                    {{#each address}}
+                                    <label class="list-group-item">
+                                        <div class="input-container">
+                                            <input type="radio" name="addressId" value="{{this._id}}" required>
+                                        </div>
+                                        <div class="label-container">
+                                            <span>{{billing_address}}<br>{{city}}<br>{{state}}<br>{{zipcode}}<br>{{phone}}</span>
+                                        </div>
+                                    </label>
+                                    {{/each}}
+                                  </form>
+                                </div>                                                 
+                        </div>
+                        
+                    </div>
+                    <div class="col-md-6">
+                      <form id="checkout-form">
+                         <div class="order_review">
+                            <div class="mb-20">
+                                <h4>Your Orders</h4>
+                            </div>
+                            <div class="table-responsive order_table text-center">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2">Product</th>
+                                            <th>Unit price</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                     
+                                           {{#each cartItems}}
+                                           
+                                            <tr>
+                                                <td class="image product-thumbnail"><img src="{{this.product.images.image2}}" alt="#"></td>
+                                                <td>
+                                                    <h5>{{this.product.product_name}}</h5> <span class="product-qty">x{{this.quantity}}</span>
+                                                </td>
+                                                <td>{{this.price}}</td>
+                                                <td>{{multiply this.quantity this.price}}</td>
+                                            </tr>
+                                          {{/each}}
+                                            <tr>
+                                                <th>SubTotal</th>
+                                               <td class="product-subtotal" colspan="3"><span id="total-amount">₹{{total}}</span></td>
+                                               
+                                            </tr>
+                                            <tr>
+                                                <th>Shipping</th>                                               
+                                                <td colspan="3"><em>Free Shipping</em></td>
+                                                
+                                            </tr>
+                                            <tr>
+                                                <th>Coupon Discount</th>
+                                                <td colspan="3"><span id="discount-amount">₹</span></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Total</th>
+                                                <td colspan="3" class="product-subtotal"><span id="main-total" class="font-xl text-brand fw-900">₹{{total}}</span></td>
+                                            </tr>              
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+                            <div class="payment_method">
+                                <div class="mb-25">
+                                    <h5>Payment</h5>
+                                </div>
+                                <div class="payment_option">
+                                    <div class="custome-radio">
+                                        <input class="form-check-input" required="" type="radio" name="payment-option" value="COD" id="exampleRadios4" checked="">
+                                        <label class="form-check-label" for="exampleRadios4" data-bs-toggle="collapse" data-target="#cod" aria-controls="cod">Cash on delivery</label>
+                                        <div class="form-group collapse in" id="cod">
+                                            <p class="text-muted mt-5">Make ready the money at delivery </p>
+                                        </div>
+                                    </div>
+                                    <div class="custome-radio">
+                                        <input class="form-check-input" required="" type="radio" name="payment-option" value="ONLINE" id="exampleRadios5" checked="">
+                                        <label class="form-check-label" for="exampleRadios5" data-bs-toggle="collapse" data-target="#upi" aria-controls="upi">UPI</label>
+                                        <div class="form-group collapse in" id="upi">
+                                            <p class="text-muted mt-5">Pay via PayPal; you can pay with your credit card if you don't have a PayPal account.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit"  class="btn btn-fill-out submit" >Place Order</button>
+                        </div>
+                      </form>
+                    </div>
+                 
+            </div> 
+         </div>
+    </section>
+</main>
+
+<script>
+$(document).ready(function() {
+  $("#coupon-form").submit((e)=>{
+    e.preventDefault();
+    let couponCode = $('#coupon-form').serialize();
+    $.ajax({
+      url:'/apply-coupon',
+      method:'POST',
+      data:couponCode,
+      success:(response)=>{
+        // Update the discount amount in the HTML
+        $('#discount-amount').text(response.discountAmount);
+
+        const totalAmount = parseFloat($('#total-amount').text().replace('₹', ''));
+        const discountAmount = parseFloat(response.discountAmount);
+        const mainTotal = totalAmount - discountAmount;
+        console.log(totalAmount,discountAmount,mainTotal)
+        // Update the main total in the HTML
+        $('#main-total').text(mainTotal);
+        Swal.fire({
+          icon: 'success',
+          title: 'Coupon applied!!',
+          showConfirmButton: false,
+          timer: 1000
+        });
+      },
+      error: (xhr, status, error) => {
+        // Handle error response
+        const response = xhr.responseJSON;
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: response.error,
+          showConfirmButton: false,
+          timer: 1000
+        });
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+<script>
+ $(document).on('click', '.copy-coupon', copyCoupon);
+    
+    // Define the copyCoupon function
+    function copyCoupon() {
+      var couponCode = $(this).data('coupon');
+      var $tempInput = $('<input>');
+      $('body').append($tempInput);
+      $tempInput.val(couponCode).select();
+      document.execCommand('copy');
+      $tempInput.remove();
+      Swal.fire({
+        icon: 'success',
+        title: 'Coupon code copied to clipboard',
+        text: couponCode,
+        showConfirmButton: false,
+        timer: 1000
+        });
+    }
+
+</script>
+
+ 
+<script>
+$(document).ready(() => {
+    $('#checkout-form').submit((e) => {
+        e.preventDefault();
+
+        // get the serialized data from both forms
+        const addressFormData = $('#address-form').serialize();       
+        const checkoutFormData = $('#checkout-form').serialize();
+        const data = `${addressFormData}&${checkoutFormData}`;
+        
+
+        // send the data using AJAX
+        $.ajax({
+        url: '/check-out-post',
+        method: 'post',
+        data: data,
+        success: (response) => {
+            if (response.codSuccess) {
+            Swal.fire({
+                title: 'Good job!',
+                text: 'Order placed',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500 // Increase timer to 4 seconds
+            });
+            setTimeout(() => {
+                location.href = '/order-placed';
+            }, 1000); // Delay the redirection by 4 seconds as well
+            } else {
+            razorpayPayment(response);
+            }
+        }
+        });
+    });
+
+
+
+        function razorpayPayment(order){
+            let options={
+                "key":"rzp_test_sNyg6FiQEq6NSc",
+                "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                "currency": "INR",
+                "name": "Phone Kart", //your business name
+                "description": "Test Transaction",
+                "image": "https://example.com/your_logo",
+                "order_id": order.id, //This is a sample Order ID. Pass 
+                "handler":function(response){
+                   
+                    verifyPayment(response,order)
+                },
+                "prefill": {
+                    "name": "  ", //your customer's name
+                    "email": " ",
+                    "contact": " "
+                },
+                "notes": {
+                    "address": "Razorpay Corporate Office"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+             }
+             let razp1 = new Razorpay(options)
+             razp1.open();
+        }   
+
+        function verifyPayment(payment,order){
+            $.ajax({
+                url:'/verify-payment',
+                data:{
+                    payment,
+                    order
+                },
+                method:'post',
+                success:(response)=>{
+                    if(response.status){
+                        Swal.fire({
+                            title: 'Good job!',
+                            text: 'Order placed',
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 1500 // Increase timer to 4 seconds
+                        }); 
+                            location.href = '/order-placed';
+                    }else{
+                        alert("payment failed")
+                    }
+                }
+            })
+        }
+    });
+ </script>

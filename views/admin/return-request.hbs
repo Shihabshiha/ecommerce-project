@@ -1,0 +1,81 @@
+<div class="screen-overlay"></div>
+{{>admin-side}}
+<main class="main-wrap"> 
+    <section class="content-main">
+        
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Return Request List </h2>
+            <p>Customers orders and their return details</p>
+        </div>
+
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Sl.No</th>
+                            <th>Order ID</th>
+                            <th scope="col">Product</th> 
+                            <th scope="col">Quantity</th>                
+                            <th scope="col">Total amount</th>               
+                            <th scope="col">Order Date</th>
+                            <th scope="col">return Date</th>
+                            <th scope="col">Reason</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each returnRequests}}
+                        <tr>
+                            <td>{{this.serialNumber}}</td>
+                            <td>{{this.orderId}}</td>
+                            <td>{{this.product.product_name}}</td>
+                            <td>{{this.quantity}}</td>
+                            <td>{{multiply this.quantity this.product.price}}</td>
+                            <td>{{this.orderDate}}</td>
+                            <td>{{formatDate this.returnedDate}}</td>
+                            <td>{{this.reason}}</td>
+                            {{#if this.isApproved}}
+                            <td>Approved</td>
+                            {{else}}
+                            <td>
+                                <a onclick="returnApprove('{{this._id}}','{{this.userId}}','{{this.orderId}}','{{multiply this.quantity this.product.price}}')" class="btn btn-md rounded font-xs btn-xs">Approve</a>
+                            </td>
+                            {{/if}}
+                        </tr>
+                      {{/each}}
+                    </tbody>
+                </table>
+            </div> <!-- table-responsive //end -->
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+    <div class="pagination-area mt-30 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        {{#if pagination.prevPage}}
+                        <li class="page-item">
+                            <a class="page-link" href="{{pagination.prevPage.url}}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {{/if}}
+                        {{#each pagination.pages}}
+                        <li class="page-item {{#if active}}active{{/if}}">
+                            <a class="page-link" href="{{url}}">{{page}}</a>
+                        </li>
+                        {{/each}}
+                        {{#if pagination.nextPage}}
+                        <li class="page-item">
+                            <a class="page-link" href="{{pagination.nextPage.url}}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        {{/if}}
+                    </ul>
+                </nav>
+            </div>
+    </section> <!-- content-main end// -->
+</main>

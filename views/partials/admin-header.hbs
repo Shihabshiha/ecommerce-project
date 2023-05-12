@@ -1,0 +1,21 @@
+<header class="main-header style-2 navbar">
+  <div class="col-brand">
+    <a href="#" class="brand-wrap">
+      <img
+        src="/admin-assets/imgs/logo.png"
+        class="logo"
+        alt="Evara Dashboard"
+      />
+    </a>
+  </div>
+  
+  <div class="col-nav">
+    <ul class="nav">
+      {{#if admin}}
+      <li>
+        <a href="/admin/admin-logout" class="btn btn-sm">Logout</a>
+      </li>
+      {{/if}}
+    </ul>
+  </div>
+</header>

@@ -1,0 +1,114 @@
+
+
+<main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/" rel="nofollow">Home</a>
+                    <span></span> Shop
+                    <span></span> Your Cart
+                </div>
+            </div>
+        </div>
+        <section class="mt-50 mb-50">
+            <div class="container">
+                <div class="row">
+                  {{#if total}}
+                    <div class="col-12">
+                      
+                        <div class="table-responsive">  
+                            <table class="table shopping-summery text-center clean">
+                                <thead>
+                                    <tr class="main-heading">
+                                        <th scope="col">Image</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Subtotal</th>
+                                        <th scope="col">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                  <!-- Loop through each item in the cartItems array -->
+                                  {{#each cartItems}}
+                                    <tr>
+                                      <td class="image product-thumbnail"><img src="{{this.product.images.image2}}" alt="#"></td>
+                                      <td class="product-des product-name">
+                                        <h5 class="product-name">{{this.product.product_name}}</h5>
+                                      </td>
+                                      <td class="price"  data-title="Price"><span id="price-{{this.product._id}}">{{formatMoney this.product.price}}</span></td>
+                                      <td class="text-center" data-title="Stock">
+                                        <div class="detail-qty border radius  m-auto">
+                                          <a onclick="changeQuantity('{{this._id}}','{{this.product._id}}','{{../userId}}',-1)" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
+                                          <span class="qty-val" id="{{this.product._id}}">{{this.quantity}}</span>
+                                          <a onclick="changeQuantity('{{this._id}}','{{this.product._id}}','{{../userId}}',1)" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
+                                        </div>
+                                      </td>
+                                      <td class="text-right" data-title="Cart">                                                              
+                                        <span id="subtotal-{{this.product._id}}">{{formatMoney this.subTotal}}</span>                                   
+                                      </td>
+                                      <td class="action" data-title="Remove"><a onclick="removeProduct('{{this._id}}','{{this.product._id}}')" class="text-muted"><i class="fi-rs-trash"></i></a></td>
+                                    </tr>
+                                  {{/each}}
+
+
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="cart-action text-end">                          
+                            <a class="btn " href="/shop-page"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+                        </div>
+                        <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div>
+                        <div class="row mb-50">
+                            <div class="col-lg-6 col-md-12">                              
+                                
+                            </div>
+                            <div class="col-lg-6 col-md-12">
+                                <div class="border p-md-4 p-30 border-radius cart-totals">
+                                    <div class="heading_s1 mb-3">
+                                        <h4>Cart Totals</h4>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="cart_total_label">Cart Subtotal</td>
+                                                    <td class="cart_total_amount"><span id="total" class="font-lg fw-900 text-brand">{{formatMoney total}}</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Shipping</td>
+                                                    <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Total</td>
+                                                    <td class="cart_total_amount"><strong><span id="total1" class="font-xl fw-900 text-brand">{{formatMoney total}}</span></strong></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <a href="/check-out" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{else}}
+                        <div class="col-lg-8 m-auto">
+                          <h2 class="mb-30">Cart is empty</h2>
+                          <p class="font-lg text-grey-700 mb-30">
+                              shop now...<br> add products..! 
+                          </p>    
+                       </div>  
+                      <div class="cart-action text-end">                          
+                          <a class="btn " href="/shop-page"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+                      </div>                                                      
+                    {{/if}}
+                </div>
+            </div>
+        </section>
+    </main>
+
+
+
+
+

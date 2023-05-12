@@ -1,0 +1,142 @@
+
+<div class="screen-overlay"></div>
+{{>admin-side}}
+<main class="main-wrap"> 
+    <section class="content-main">
+        
+    <div class="card mb-4">
+                  <div class="card-header">
+                     <div class="row">
+                            <div class="col">
+                                <h3 class="mb-0">Order List</h3>
+                            </div>
+                            <div class="col-auto">
+                                <form class="d-flex">
+                                    <input type="text" id="search-input" placeholder="Search name or order ID">
+
+                                    {{!-- <button class="btn btn-primary" id="search-btn">Search</button> --}}
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                <table class="table table-hover" id="orderTable">
+                    <thead>
+                        <tr>
+                            <th>Sl.No</th>
+                            <th>Order ID</th>
+                            <th scope="col">Customer Name</th>                 
+                            <th scope="col">Total</th>               
+                            <th scope="col">Date</th>
+                            <th scope="col">Status</th>
+                            <th scope="col" > Options </th>
+                            <th scope="col" > Details </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each orders}}
+                        <tr>
+                            <td>{{this.serialNumber}}</td>
+                            <td>{{this.orderId}}</td>
+                            <td><b>{{this.userName}}</b></td>
+                            <td>{{this.totalPrice}}</td>
+                            <td>{{this.orderDate}}</td>
+                            {{#if (eq status "placed")}}
+                                <td><span class="badge rounded-pill alert-success">Placed</span></td>
+                                {{else if (eq status "pending")}}
+                                <td><span class="badge rounded-pill alert-warning">Pending</span></td>
+                                {{else if (eq status "cancelled")}}
+                                <td><span class="badge rounded-pill alert-danger">Canceled</span></td>
+                                {{else if (eq status "confirmed")}}
+                                <td><span class="badge rounded-pill alert-warning">Confirmed</span></td>
+                                {{else if (eq status "shipped")}}
+                                <td><span class="badge rounded-pill alert-primary">Shipped</span></td>
+                                {{else if (eq status "delivered")}}
+                                <td><span class="badge rounded-pill alert-info">Deliverd</span></td>
+                                {{else if (eq status "returned")}}
+                                <td><span class="badge rounded-pill alert-secondary">Returned</span></td>
+                                {{else if (eq status "cancelled")}}
+                                <td><span class="badge rounded-pill alert-secondary">Cancelled</span></td>
+                            {{/if}}
+                        <td class="">
+                            <div class="status-buttons">
+                                <select id="status-select-{{this._id}}" class="form-select form-select-sm"
+                                onchange="changeOrderStatus('{{this._id}}','{{this.status}}', this.value)"
+                                style="font-size: 13px;width: 140px;">
+                                <option selected disabled>Change status</option>
+                                <option value="placed">Placed</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="delivered">delivered</option>
+                                {{!-- <option value="completed">Completed</option> --}}
+                                <option value="cancelled">cancelled</option>
+                            </select>
+                            </div>
+                        </td>
+
+                            <td >
+                                <a href="/admin/order-details/{{this._id}}" class="btn btn-md rounded font-xs btn-xs">Detail</a>                  
+                            </td>
+                            
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+             <!-- table-responsive //end -->
+         <!-- card-body end// -->
+    </div> <!-- card end// -->
+    <div class="pagination-area mt-30 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        {{#if pagination.prevPage}}
+                        <li class="page-item">
+                            <a class="page-link" href="{{pagination.prevPage.url}}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {{/if}}
+                        {{#each pagination.pages}}
+                        <li class="page-item {{#if active}}active{{/if}}">
+                            <a class="page-link" href="{{url}}">{{page}}</a>
+                        </li>
+                        {{/each}}
+                        {{#if pagination.nextPage}}
+                        <li class="page-item">
+                            <a class="page-link" href="{{pagination.nextPage.url}}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        {{/if}}
+                    </ul>
+                </nav>
+            </div>
+    </section> <!-- content-main end// -->
+</main>
+
+<script>
+    $(document).ready(function() {
+  // Add event listener to search input
+  $('#search-input').on("keyup", function() {
+    // Get search query
+    var query = $(this).val().toLowerCase();
+
+    // Filter table rows based on search query
+    $('#orderTable tbody tr').each(function() {
+      // Check if any column contains search query
+      var match = false;
+      $(this).find('td').each(function() {
+        if ($(this).text().toLowerCase().indexOf(query) !== -1) {
+          match = true;
+        }
+      });
+      
+      // Show/hide row based on search query
+      if (match) {
+        $(this).show();
+      } else {
+        $(this).hide();
+      }
+    });
+  });
+});
+
+</script>

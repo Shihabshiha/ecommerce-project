@@ -1,0 +1,133 @@
+
+
+
+
+
+
+{{>admin-side}}
+
+    <main class="main-wrap">
+     
+    <section class="content-main">
+        <div class="card mb-4">
+            <div class="card-header">
+                     <div class="row">
+                            <div class="col">
+                                <h3 class="mb-0">Users List</h3>
+                            </div>
+                            <div class="col-auto">
+                                <form class="d-flex">
+                                    <input type="text" id="search-input" placeholder="Search name">
+
+                                    {{!-- <button class="btn btn-primary" id="search-btn">Search</button> --}}
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                        
+                            <table class="table align-middle table-nowrap mb-0" id="userTable">   
+                                <thead class="table-light">
+                                    <tr>
+                                        <th  class="align-middle" scope="col">Sl No</th>
+                                        <th class="align-middle" scope="col">Name</th>
+                                        <th class="align-middle" scope="col">Email</th>
+                                        <th class="align-middle" scope="col">Status</th>
+                                        <th class="align-middle" scope="col">Action</th>
+                                        
+                                        {{!-- <th class="align-middle" scope="col">Payment Method</th>
+                                        <th class="align-middle" scope="col">View Details</th> --}}
+                                    </tr>
+                                </thead>
+                              
+                                <tbody>
+                                  {{#each userDetails}}
+                                    <tr>
+                                        <td>{{this.serialNumber}}</td>
+                                        <td>{{this.name}}</td>
+                                        <td>
+                                            {{this.email}}
+                                        </td>
+                                        {{#if access}}
+                                        <td>
+                                            <span class="badge badge-pill badge-soft-custom-success">Active</span>
+                                        </td>
+                                        <td>
+                                            <a href="/admin/user-block/{{this._id}}" class="btn btn-xs btn-custom-danger">Block</a> 
+                                        </td>
+                                        {{else}}
+                                        <td>
+                                            <span class="badge badge-pill badge-soft-custom-danger">Inactive</span>
+                                        </td>
+                                        <td>
+                                            <a href="/admin/user-unblock/{{this._id}}" class="btn btn-xs btn-custom-success">Unblock</a> 
+                                        </td>
+                                        {{/if}}
+                                    </tr>
+                                  {{/each}}
+                                </tbody>
+                              
+                            </table>
+                         <!-- table-responsive end// -->
+                
+                <div class="pagination-area mt-30 mb-50">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-start">
+                            {{#if pagination.prevPage}}
+                            <li class="page-item">
+                                <a class="page-link" href="{{pagination.prevPage.url}}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            {{/if}}
+                            {{#each pagination.pages}}
+                            <li class="page-item {{#if active}}active{{/if}}">
+                                <a class="page-link" href="{{url}}">{{page}}</a>
+                            </li>
+                            {{/each}}
+                            {{#if pagination.nextPage}}
+                            <li class="page-item">
+                                <a class="page-link" href="{{pagination.nextPage.url}}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            {{/if}}
+                        </ul>
+                    </nav>
+                </div>
+
+          
+        
+       </div>
+      </section> <!-- content-main end// -->
+     
+    </main>
+
+    <script>
+          $(document).ready(function() {
+            // Add event listener to search input
+            $('#search-input').on("keyup", function() {
+                // Get search query
+                var query = $(this).val().toLowerCase();
+
+                // Filter table rows based on search query
+                $('#userTable tbody tr').each(function() {
+                // Check if any column contains search query
+                var match = false;
+                $(this).find('td').each(function() {
+                    if ($(this).text().toLowerCase().indexOf(query) !== -1) {
+                    match = true;
+                    }
+                });
+                
+                // Show/hide row based on search query
+                if (match) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+                });
+            });
+            });  
+
+    </script>

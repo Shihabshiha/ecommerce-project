@@ -1,0 +1,86 @@
+
+
+
+
+
+{{>admin-side}}
+
+    <main class="main-wrap">
+        <section class="content-main">
+            <div class="row">
+                <div class="col-6">
+                  <form action="/admin/edit-product/{{productInfo._id}}" method="post" >
+                      <div class="content-header">
+                        <h2 class="content-title">Edit a Product</h2>
+                        <div>
+                            <button class="btn btn-md rounded font-sm hover-up" type="submit">Update Product</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>1. General info</h6>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="mb-4">
+                                        <label class="form-label">Product Name</label>
+                                        <input type="text" placeholder="Type here" class="form-control"  name="product_name" value="{{productInfo.product_name}}" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Description</label>
+                                        <input type="text" placeholder="Type here" class="form-control"  name="product_description" value="{{productInfo.product_description}}" required>
+                                        {{!-- <textarea placeholder="Type here" class="form-control"  rows="4"></textarea> --}}
+                                    </div>
+                                    {{!-- <div class="mb-4">
+                                        <label class="form-label">Brand name</label>
+                                        <select class="form-select">
+                                            <option> Adidas </option>
+                                            <option> Nike </option>
+                                            <option> Puma </option>
+                                        </select>
+                                    </div>  --}}
+                                </div> <!-- col.// -->
+                            </div> <!-- row.// -->
+                            <hr class="mb-4 mt-0">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>2. Pricing</h6>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="mb-4">
+                                        <label class="form-label">Cost in INR</label>
+                                        <input type="text" placeholder="₹00.0" class="form-control"  name="price" value="{{productInfo.price}}" required>
+                                    </div>
+                                </div> <!-- col.// -->
+                            </div> <!-- row.// -->
+                            <hr class="mb-4 mt-0">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6>3. Category</h6>
+                                </div>
+                               
+                                <div class="col-md-9 " style="margin-bottom: 40px;">
+                                    <div class="mb-0">
+                                        <select class="form-select" name="category_name" value="{{productInfo.category_name}}">
+                                        {{#each categories}}
+                                            <option> {{this.category_name}} </option>
+                                        {{/each}}
+                                        </select>
+                                    </div>
+                                </div> <!-- col.// -->
+                            </div> <!-- row.// -->
+                            <hr class="mb-4 mt-0">
+                        </div>
+                    </div>
+                </div>
+              </form>
+  
+             </div>
+            </div>
+        </section> <!-- content-main end// -->
+      </main>

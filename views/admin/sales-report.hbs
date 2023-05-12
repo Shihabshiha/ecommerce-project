@@ -1,0 +1,66 @@
+
+
+{{>admin-side}}
+<main class="main-wrap">
+    <section class="content-main">
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col">
+                        <h3 class="mb-0">Sales Report</h3>
+                    </div>
+                    <form action="/admin/sales-report" method="get">
+                        <div class="form-group row">
+                            <label for="start-date" class="col-sm-2 col-form-label">Start Date:</label>
+                            <div class="col-sm-2">
+                                <input type="date" class="form-control" id="start-date" name="startDate">
+                            </div>
+                            <label for="end-date" class="col-sm-2 col-form-label">End Date:</label>
+                            <div class="col-sm-2">
+                                <input type="date" class="form-control" id="end-date" name="endDate">
+                            </div>
+                            <div class="col-sm-2">
+                              <button type="submit" class="btn btn-success btn-sm download-report ">Filtered Report</button>
+                            </div>
+
+                            <div class="col-sm-2">
+                                <a href="/admin/sales-reportDownload?startDate={{startDate}}&endDate={{endDate}}" class="btn btn-success btn-sm download-report">Download Report</a>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Total Orders:</td>
+                        <td>{{sales.totalOrders}}</td>
+                    </tr>
+                    <tr>
+                        <td>Total Products Sold:</td>
+                        <td>{{sales.totalProductsSold}}</td>
+                    </tr>
+                    <tr>
+                        <td>Total Revenue:</td>
+                        <td>{{sales.totalRevenue}}</td>
+                    </tr>
+                    <tr>
+                        <td>Total Profit:</td>
+                        <td>{{sales.totalProfit}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- table-responsive end// -->
+        </div>
+    </section>
+    <!-- content-main end// -->
+</main>
+
+<script>
+  const startDate=document.getElementById('start-date')
+  startDate.value='{{startDate}}'
+  const endDate=document.getElementById('end-date')
+  endDate.value='{{endDate}}'
+</script>
