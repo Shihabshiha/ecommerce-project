@@ -39,6 +39,7 @@ adminLoginPost: async (req, res) => {
   }
 },
 
+
 //admin logout
 adminLogout:(req,res)=>{
   try {

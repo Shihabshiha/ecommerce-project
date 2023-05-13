@@ -353,7 +353,7 @@ deleteAddressbyId: async (req, res) => {
  getOrderPlaced : (req, res) => {
   try {
     let user = req.session.user;
-    res.render('user/order-placed', { user });
+    res.render('user/order-Placed', { user });
   } catch (err) {
     console.error(err);
     res.render('error', { message: 'Error occurred while fetching order details' });
