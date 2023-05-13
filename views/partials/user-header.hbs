@@ -45,17 +45,21 @@
                         </div>
                         <div class="header-action-right">
                             <div class="header-action-2">
-                                <div class="header-action-icon-2">
+                                {{!-- <div class="header-action-icon-2">
                                     <a href="shop-wishlist.html">
                                         <img class="svgInject" alt="Evara" src="/user-assets/imgs/theme/icons/icon-heart.svg">
                                         <span class="pro-count blue" >1</span>
                                     </a>
-                                </div>
+                                </div> --}}
                                 <div class="header-action-icon-2">
+                                 
                                     <a class="mini-cart-icon" href="/view-Cart">
                                         <img alt="Evara" src="/user-assets/imgs/theme/icons/icon-cart.svg">
+                                        {{#if cartCount}}
                                         <span class="pro-count blue" id="cart-count">{{cartCount}}</span>
-                                    </a>                            
+                                        {{/if}}
+                                    </a>    
+                                                         
                                 </div> 
                                 <div class="header-action-icon-2">
                                     <a href="/user-profile">
@@ -87,7 +91,6 @@
                                     <li><a href="/shop-page">Shop <i class="fi-rs-angle-down"></i></a>
                                         <ul class="sub-menu">
                                             <li><a href="/shop-page">Shop page</a></li>
-                                            <li><a href="#">Shop – Wishlist</a></li>
                                             <li><a href="/view-cart">Shop – Cart</a></li>
                                             <li><a href="/check-out">Shop – Checkout</a></li>
                                         </ul>
