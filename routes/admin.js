@@ -69,7 +69,7 @@ router.route('/order-details/:id').get(session_check.adminLogged,adminController
 router.route('/coupon')
 .get(session_check.adminLogged,adminController.getCouponPage)
 .post(adminController.addCoupon)
-
+.delete(adminController.deleteCoupon)
 //return order managment
 router.route('/return-item')
 .get(session_check.adminLogged,adminController.getReturnRequest)

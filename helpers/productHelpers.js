@@ -41,8 +41,9 @@ module.exports={
   ,
 
   //ctaegory wise filter the produts
-  categoryWiseFilter: async (id) => {
+  categoryWiseFilter: async (categoryId,page,limit) => {
     try {
+      const startingIndex = (page - 1) * limit;
       const products = await db.get()
       .collection(collection.PRODUCT_COLLECTION)
       .aggregate([
@@ -56,16 +57,20 @@ module.exports={
         },
         {
           $match: {
-            "category._id": ObjectId(id)
+            "category._id": ObjectId(categoryId)
           }
         }
-      ]).toArray();
-      console.log(products);
+      ]).sort({ createdAt: -1 })
+      .skip(startingIndex)
+      .limit(limit)
+      .toArray();
+      console.log('category products',products);
       return products;
     } catch (error) {
       console.log(error);
     }
   },
+
 
   //get total product count
   getTotalProductsCount:async()=>{
@@ -97,6 +102,25 @@ module.exports={
         reject(err);
       }
     });
+  },
+
+  //get category wise item count
+  getCategoryItemCount:async(categoryId)=>{
+    try{
+      const category = await db.get()
+      .collection(collection.CATEGORY_COLLECTION)
+      .findOne({_id:ObjectId(categoryId)})
+     
+      const categoryName = category.category_name;
+      
+      const count=await db.get()
+      .collection(collection.PRODUCT_COLLECTION)
+      .countDocuments({category_name:categoryName})
+      return count;
+    }catch(error){
+      console.log(error);
+      throw error
+    }
   }
   
 

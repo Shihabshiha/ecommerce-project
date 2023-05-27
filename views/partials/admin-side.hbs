@@ -1,80 +1,107 @@
-  <aside class="navbar-aside" id="offcanvas_aside">
-        <div class="aside-top">
-            <a href="/admin" class="brand-wrap">
-                <img src="/admin-assets/imgs/logo.png" class="logo" alt="Evara Dashboard">
-            </a>
-            {{!-- <div>
-                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
-            </div> --}}
-        </div>
-        <nav>
-            <ul class="menu-aside">
-                <li class="menu-item active">
-                    <a class="menu-link" href="/admin"> <i class="icon material-icons md-home"></i>
-                        <span class="text">Dashboard</span>
-                    </a>
-                </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="page-products-list.html"> <i class="icon material-icons md-shopping_bag"></i>
-                        <span class="text">Products</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="/admin/all-product">All Product List</a>
-                        <a href="/admin/category">Category</a>
-                        {{!-- <a href="page-products-grid-2.html">Product grid 2</a>
-                        <a href="page-categories.html">Categories</a> --}}
-                    </div>
-                </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="#"> <i class="icon material-icons md-shopping_cart"></i>
-                        <span class="text">Orders</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="/admin/order-list">Order list </a>   
-                        <a href="/admin/return-item">Return Request list </a>                                          
-                    </div>
-                  
-                </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="/admin/coupon"> <i class="icon material-icons md-store"></i>
-                        <span class="text">Coupon</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="/admin/coupon">Coupens</a>                  
-                    </div>
-                </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="#"> <i class="icon material-icons md-person"></i>
-                        <span class="text">Users</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="/admin/users">Users list</a>
-                    </div>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" disabled href="/admin/sales-report"> <i class="icon material-icons md-pie_chart"></i>
-                        <span class="text">Sales Report</span>
-                    </a>
-                </li>
-            </ul>
-            <hr>
-            {{!-- <ul class="menu-aside">
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="#"> <i class="icon material-icons md-settings"></i>
-                        <span class="text">Settings</span>
-                    </a>
-                    <div class="submenu">
-                        <a href="page-settings-1.html">Setting sample 1</a>
-                        <a href="page-settings-2.html">Setting sample 2</a>
-                    </div>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="page-blank.html"> <i class="icon material-icons md-local_offer"></i>
-                        <span class="text"> Starter page </span>
-                    </a>
-                </li>
-            </ul> --}}
-            <br>
-            <br>
-        </nav>
-    </aside>
+<aside class="navbar-aside" id="offcanvas_aside">
+    <div class="aside-top">
+        <a href="/admin" class="brand-wrap">
+            <img src="/admin-assets/imgs/logo.png" class="logo" alt="Evara Dashboard">
+        </a>
+    </div>
+    <nav>
+        <ul class="menu-aside">
+            <li class="menu-item">
+                <a class="menu-link" href="/admin">
+                    <i class="icon material-icons md-home"></i>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li class="menu-item ">
+                <a class="menu-link" href="/admin/all-product">
+                    <i class="icon material-icons md-shopping_bag"></i>
+                    <span class="text">Products</span>
+                </a>
+               
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/category">
+                    <i class="icon material-icons md-label"></i>
+                    <span class="text">Category</span>
+                </a>
+            </li>
+            <li class="menu-item ">
+                <a class="menu-link" href="/admin/order-list">
+                    <i class="icon material-icons md-shopping_cart"></i>
+                    <span class="text">Orders</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/return-item">
+                    <i class="icon material-icons md-assignment_returned"></i>
+                    <span class="text">Return Request list</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/coupon">
+                    <i class="icon material-icons  md-local_offer"></i>
+                    <span class="text">Coupon</span>
+                </a>
+            </li>
+            <li class="menu-item ">
+                <a class="menu-link" href="/admin/users">
+                    <i class="icon material-icons md-person"></i>
+                    <span class="text">Users</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/sales-report" disabled>
+                    <i class="icon material-icons md-pie_chart"></i>
+                    <span class="text">Sales Report</span>
+                </a>
+            </li>
+        </ul>
+        <hr>
+        <br>
+        <br>
+    </nav>
+</aside>
+
+<script>
+$(document).ready(function() {
+    // Add "active" class to the selected menu item
+    var currentPath = window.location.pathname;
+    $('.menu-link[href="' + currentPath + '"]').closest('.menu-item').addClass('active');
+
+    // Handle menu item click event
+    $('.menu-link').click(function(e) {
+        var menuItem = $(this).closest('.menu-item');
+        var submenu = menuItem.find('.submenu');
+
+        if (submenu.length > 0) {
+            // Menu item has a submenu
+            if (menuItem.hasClass('active')) {
+                // Submenu is currently open, close it
+                menuItem.removeClass('active');
+                
+            } else {
+                // Submenu is currently closed, open it
+                $('.menu-item').removeClass('active');
+                // Close other submenus
+                menuItem.addClass('active');
+                
+            }
+            e.preventDefault();
+        } else {
+            // Menu item does not have a submenu
+            $('.menu-item').removeClass('active');
+            menuItem.addClass('active');
+        }
+    });
+
+    // Add "active" class to parent menu item when submenu item is clicked
+    $('.submenu a').click(function() {
+        $('.menu-item').removeClass('active');
+        $(this).closest('.menu-item').addClass('active');
+    });
+});
+
+
+</script>
+
+

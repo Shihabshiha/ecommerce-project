@@ -1,41 +1,67 @@
 
 //add to cart
 
-function addtoCart(productId){
+function addtoCart(productId) {
   console.log('ajax loaded');
   console.log(productId);
   $.ajax({
     url: '/add-to-cart',
-    data:{
+    data: {
       productId
     },
-    method: "post",
+    method: 'post',
     success: (response) => {
       if (response.status) {
-        let count=$('#cart-count').html()
-        count=parseInt(count)+1
-        $("#cart-count").html(count)
+        let countElement = $('#cart-count');
+        let count = parseInt(countElement.html()) + 1;
+        countElement.html(count);
         Swal.fire({
           position: 'top-end',
           icon: 'success',
           title: 'Product Added Successfully!',
           showConfirmButton: false,
           timer: 1000
-        })
+        });
+      } else {
+        if (response.message === 'User not logged in') {
+          // Redirect to the login page
+          window.location.href = '/user-login';
+        } else if (response.message === 'User blocked by admin') {
+          // Display a message indicating that the user is blocked
+          Swal.fire({
+            position: 'top-end',
+            icon: 'error',
+            title: 'User blocked by admin',
+            showConfirmButton: false,
+            timer: 2000
+          });
+        }
       }
-   },
-  });
+    },
+    error: (error) => {
+      console.log(error);
+      alert(error)
+    }
+  });
 }
+
 
 //change quantity
 
-function changeQuantity(cartId, productId,userId, count) {
-  let quantity = parseInt(document.getElementById(productId).innerHTML);
-  count = parseInt(count); 
+const handleQuantityChangeDebounced = _.debounce((cartId, productId, userId, count) => {
+  changeQuantity(cartId, productId, userId, count);
+}, 300);
+
+// AJAX function to change quantity
+function changeQuantity(cartId, productId, userId, count) {
+  let quantityElement = document.getElementById(`quantity-${productId}`);
+  let quantity = parseInt(quantityElement.innerText);
+  count = parseInt(count);
+
   $.ajax({
     url: "/change-quantity",
     data: {
-      user:userId,
+      user: userId,
       cart: cartId,
       product: productId,
       count: count,
@@ -43,38 +69,38 @@ function changeQuantity(cartId, productId,userId, count) {
     },
     method: "post",
     success: (response) => {
-      if (response.removed) {
-            Swal.fire({
-              title: 'Good Job',
-              text: 'Item removed!',
-              icon: 'error',
-              timer: 1000 // time in milliseconds
-            });
+      console.log(response);
+      if (response.status) {
+        let price = document.getElementById(`price-${productId}`).innerText;
+        price = rupeesToInteger(price);
+        let subtotal = price * (quantity + count);
+        document.getElementById(`subtotal-${productId}`).innerHTML = formatMoney(subtotal);
+        document.getElementById('total').innerHTML = formatMoney(response.total);
+        document.getElementById('total1').innerHTML = formatMoney(response.total);
+        quantityElement.innerText = quantity + count;
+      } else if (response.removed) {
+        Swal.fire({
+          title: 'Warning..!',
+          text: 'Item removed!',
+          icon: 'error',
+          timer: 1000
+        });
 
-            // Reload the page after the timer expires
-            setTimeout(() => {
-              location.reload();
-            }, 1000); // time in milliseconds
-          
-      } else {
-        document.getElementById(productId).innerHTML = quantity + count;
-        let price = document.getElementById(`price-${productId}`).innerText
-        price = rupeesToInteger(price)
-        let qty = quantity +count
-        console.log(price,qty)
-        let subtotal = price * qty
-        console.log(subtotal)
-        document.getElementById(`subtotal-${productId}`).innerHTML = formatMoney(subtotal)
-        document.getElementById('total').innerHTML=formatMoney(response.total) ;
-        document.getElementById('total1').innerHTML=formatMoney(response.total);
+        // Reload the page after the timer expires
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
       }
     },
-     error: function (error) { // corrected parameter name (data -> error)
+    error: function (error) {
       alert(error);
       console.log(JSON.stringify(error));
-    }, 
+    }
   });
 }
+
+
+
 
 function rupeesToInteger(amountStr) {
   // Remove commas and the currency symbol from the string
@@ -94,7 +120,6 @@ function formatMoney(amount) {
   });
   return formatter.format(amount);
 }
-
 
 
 //remove products from cart
@@ -413,6 +438,41 @@ function returnApprove(rtnId,usrId,odrId,totalamt){
       resolve();
     }
 
+  })
+}
+
+function deleteCoupon(couponId){
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "Coupon will be removed!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, delete it!'
+   }).then((result) => {
+    if (result.isConfirmed) {
+      deleteCouponSuccess(couponId)
+    }
+   });
+  
+}
+
+function deleteCouponSuccess(couponId){
+  $.ajax({
+    method: 'DELETE',
+    url: "/admin/coupon",
+    data:  { couponId: couponId },
+    success:(response)=>{
+      Swal.fire({
+        title: "Success!",
+        text: "Your address has been deleted.",
+        icon: "success",
+        showConfirmButton: false,
+        timer:1000
+      });
+      location.reload()
+    }
   })
 }
 

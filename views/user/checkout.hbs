@@ -18,16 +18,20 @@
                     <div class="panel-collapse collapse coupon_form " id="coupon">
                         <div class="panel-body">
                             <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
-                            <form method="post" id="coupon-form">
-                                <div class="form-group">
-                                    <input type="text" placeholder="Enter Coupon Code..." name="couponCode">
-                                </div>
-                                <div class="form-group">
-                                    <button type="submit" class="btn  btn-md" name="login">Apply Coupon</button>
-                                </div>
-                            </form>
+                            <div class="form-group coupon-buttons">
+                                <div class="coupon-input">
+                                    <form method="post" id="coupon-form" class="coupon-apply-form">
+                                    <div class="form-group">
+                                        <input type="text" placeholder="Enter Coupon Code..." name="couponCode" id="couponCodeInput">
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-md" name="login">Apply Coupon</button>
+                                    </div>
+                                    </form>
+                                </div>        
+                            </div>
                         </div>
-                    </div>
+                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div id="coupon-list">                       
@@ -61,6 +65,7 @@
                             <h4>Billing Details</h4>
                         </div>
                         
+                        
                         <div class="card mb-3 mb-lg-0">
                                 <div class="card-header">
                                     <h5 class="mb-0">Billing Address</h5>
@@ -79,9 +84,50 @@
                                     </label>
                                     {{/each}}
                                   </form>
+                                  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal">Add Address</button>
                                 </div>                                                 
                         </div>
                         
+                        <!-- Modal -->
+                        <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                               <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="addAddressModalLabel">Add Address</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="add-address-form">
+                                            <div class="form-group">
+                                                <input type="text" name="billing_address" required="" placeholder="Address *">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" name="billing_address2" required="" placeholder="Address line2">
+                                            </div>
+                                            <div class="form-group">
+                                                <input required="" type="text" name="city" placeholder="City / Town *">
+                                            </div>
+                                            <div class="form-group">
+                                                <input required="" type="text" name="state" placeholder="State / County *">
+                                            </div>
+                                            <div class="form-group">
+                                                <input required="" type="text" name="zipcode" placeholder="Postcode / ZIP *">
+                                            </div>
+                                            <div class="form-group">
+                                                <input required="" type="text" name="phone" placeholder="Phone *">
+                                            </div>
+                                            <div class="form-group">
+                                                <input required="" type="text" name="email" placeholder="Email address *">
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button id="save-address-btn" type="button" class="btn ">Save Address</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                
                     </div>
                     <div class="col-md-6">
                       <form id="checkout-form">
@@ -123,7 +169,12 @@
                                             </tr>
                                             <tr>
                                                 <th>Coupon Discount</th>
-                                                <td colspan="3"><span id="discount-amount">₹</span></td>
+                                                <td colspan="3">
+                                                    <span id="discount-amount">₹</span>
+                                                    <a href="#" id="remove-coupon-btn" class="remove-coupon-btn data-toggle="tooltip" data-placement="top" title="Remove Coupon"">
+                                                    <i class="fas fa-trash-alt"></i><!-- Replace with the appropriate icon class -->
+                                                    </a>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th>Total</th>
@@ -166,8 +217,11 @@
 
 <script>
 $(document).ready(function() {
-  $("#coupon-form").submit((e)=>{
+  $("#coupon-form").submit((e) => {
     e.preventDefault();
+    if (!validateCouponForm()) {
+      return;
+    }
     let couponCode = $('#coupon-form').serialize();
     $.ajax({
       url:'/apply-coupon',
@@ -175,14 +229,14 @@ $(document).ready(function() {
       data:couponCode,
       success:(response)=>{
         // Update the discount amount in the HTML
-        $('#discount-amount').text(response.discountAmount);
+        $('#discount-amount').text('₹' + response.discountAmount);
 
         const totalAmount = parseFloat($('#total-amount').text().replace('₹', ''));
         const discountAmount = parseFloat(response.discountAmount);
         const mainTotal = totalAmount - discountAmount;
         console.log(totalAmount,discountAmount,mainTotal)
         // Update the main total in the HTML
-        $('#main-total').text(mainTotal);
+        $('#main-total').text('₹' + mainTotal);
         Swal.fire({
           icon: 'success',
           title: 'Coupon applied!!',
@@ -193,19 +247,96 @@ $(document).ready(function() {
       error: (xhr, status, error) => {
         // Handle error response
         const response = xhr.responseJSON;
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: response.error,
-          showConfirmButton: false,
-          timer: 1000
-        });
+        toastr.error(response.error, 'Oops...', {
+            closeButton: true,
+            progressBar: true,
+            timeOut: 1000,
+            positionClass: 'toast-top-right'
+            });
       }
     });
   });
-});
 
+  function validateCouponForm() {
+    var couponCodeInput = $('#couponCodeInput');
+
+    // Check if the coupon code input is empty
+    if (couponCodeInput.val().trim() === "") {
+        toastr.error('Please enter a coupon code.', {
+        positionClass: 'toast-bottom-right' 
+        });
+      // Prevent form submission
+      return false;
+    }
+    // Allow form submission if the coupon code is entered
+    return true;
+  }
+
+    // Code for removing coupon
+    $("#remove-coupon-btn").click(function(e) {
+    e.preventDefault();
+    
+    $.ajax({
+        url: '/remove-coupon',
+        method: 'POST',
+        success: function(response) {
+        if (response.success) {
+            toastr.success(response.message, 'Success', {
+            closeButton: true,
+            progressBar: true,
+            timeOut: 1000,
+            positionClass: 'toast-top-right'
+            });
+
+            // Update the discount amount and total values 
+            $('#discount-amount').text('₹0'); 
+            $('#main-total').text('₹' + response.total); 
+        } else {
+            toastr.error(response.message, 'Error', {
+            closeButton: true,
+            progressBar: true,
+            timeOut: 1000,
+            positionClass: 'toast-top-right'
+            });
+        }
+        },
+        error: function(xhr, status, error) {
+        toastr.error('Error removing coupon', 'Error', {
+            closeButton: true,
+            progressBar: true,
+            timeOut: 1000,
+            positionClass: 'toast-top-right'
+        });
+        }
+    });
+    });
+
+
+    //add new address
+    $('#save-address-btn').click(() => {
+        const formData = $('#add-address-form').serialize();
+
+        $.ajax({
+            url: '/add-new-address',
+            method: 'post',
+            data: formData,
+            success: function(response) {
+                // Handle the success response
+                toastr.success('Address saved successfully');
+                location.reload()
+            },
+            error: function(xhr, status, error) {
+                // Handle the error response
+                toastr.error('Error saving address');
+            }
+        });
+    });
+
+});
 </script>
+
+
+
 
 
 
@@ -220,12 +351,11 @@ $(document).ready(function() {
       $tempInput.val(couponCode).select();
       document.execCommand('copy');
       $tempInput.remove();
-      Swal.fire({
-        icon: 'success',
-        title: 'Coupon code copied to clipboard',
-        text: couponCode,
-        showConfirmButton: false,
-        timer: 1000
+      toastr.success('Coupon code copied to clipboard', couponCode, {
+        closeButton: true,
+        progressBar: true,
+        timeOut: 1000,
+        positionClass: 'toast-top-right'
         });
     }
 
@@ -237,11 +367,36 @@ $(document).ready(() => {
     $('#checkout-form').submit((e) => {
         e.preventDefault();
 
+         // Check if an address is available
+        if ($('input[name="addressId"]').length === 0) {
+            // No address available, show an error message or take appropriate action
+            toastr.error('No address available.! add address', 'Error', {
+                closeButton: true,
+                progressBar: true,
+                timeOut: 1000,
+                positionClass: 'toast-top-right'
+            });
+            return;
+        }
+
+        // Check if an address is selected
+        if (!$('input[name="addressId"]:checked').val()) {
+            // No address selected, show an error message
+            toastr.error('Please select an address', 'Error', {
+                closeButton: true,
+                progressBar: true,
+                timeOut: 1000,
+                positionClass: 'toast-top-right'
+            });
+            return;
+        }
+
         // get the serialized data from both forms
         const addressFormData = $('#address-form').serialize();       
         const checkoutFormData = $('#checkout-form').serialize();
         const data = `${addressFormData}&${checkoutFormData}`;
-        
+        console.log(data)
+        console.log('post checkout')
 
         // send the data using AJAX
         $.ajax({

@@ -10,8 +10,7 @@ const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID,process.env.TWIL
 // api for sending otp to the user mobile number....
    const  generateOtp = (mobileNo) => {
         return new Promise((resolve, reject) =>{
-            client.verify
-            .services(process.env.TWILIO_SERVICE_SID)
+            client.verify.v2.services(process.env.TWILIO_SERVICE_SID)
             .verifications
             .create({
                 to : `+91${mobileNo}`,
@@ -29,8 +28,7 @@ const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID,process.env.TWIL
         // console.log("mobile and otp")
         console.log(mobileNo,otp)
         return new Promise((resolve, reject) =>{
-            client.verify
-            .services(process.env.TWILIO_SERVICE_SID)
+            client.verify.v2.services(process.env.TWILIO_SERVICE_SID)
             .verificationChecks
             .create({
                 to : `+91${mobileNo}`,

@@ -172,11 +172,12 @@ module.exports = {
 
   //get sales report on daily basis
   getSalesReport: async (startDate, endDate) => {
-    
+    console.log('staaart date',startDate);
     if (startDate && endDate) {
       start = new Date(startDate);
       end = new Date(endDate);
     }
+    console.log('startdate',startDate);
   
     // If no start and end date are provided, set to null to retrieve all data
     if (!startDate && !endDate) {
@@ -187,18 +188,18 @@ module.exports = {
     let deliveredOrders = await db.get().collection(collection.ORDER_COLLECTION)
       .find({status: "delivered", createdAt: {$gte: start, $lt: end}})
       .toArray();
-  
+    
     let totalOrders = deliveredOrders.length;
     let totalProductsSold = 0;
     let totalRevenue = 0;
     let totalProfit = 0;
-  
+    console.log('orders',totalOrders);
     deliveredOrders.forEach((order) => {
       totalProductsSold += order.products.length;
       totalRevenue += order.totalPrice;
       totalProfit += order.totalPrice * 0.22; // assuming 22% profit margin
     });
-  
+    console.log('togtal order',totalProductsSold);
     return {
       totalOrders,
       totalProductsSold,

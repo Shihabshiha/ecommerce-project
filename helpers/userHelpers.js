@@ -13,8 +13,8 @@ var instance = new Razorpay({
 });
 
 module.exports = {
+
   doSignup: (userData) => {
-   
     return new Promise(async (resolve, reject) => {
       let user = await db
         .get()
@@ -24,22 +24,36 @@ module.exports = {
         reject({ exists: true });
       } else {
         userData.password = await bcrypt.hash(userData.password, 10);
-        var obj={
-          name:userData.name,
-          email:userData.email,
-          phone_no:userData.phone_no,
-          password:userData.password,
-          access:true
-        }
+        var obj = {
+          name: userData.name,
+          email: userData.email,
+          phone_no: userData.phone_no,
+          password: userData.password,
+          access: true,
+        };
         db.get()
           .collection(collection.USER_COLLECTION)
           .insertOne(obj)
-          .then((data) => {
-           resolve(data);
+          .then((result) => {
+            const insertedId = result.insertedId;
+            db.get()
+              .collection(collection.USER_COLLECTION)
+              .findOne({ _id: insertedId })
+              .then((user) => {
+                resolve(user);
+              })
+              .catch((error) => {
+                reject(error);
+              });
+          })
+          .catch((error) => {
+            reject(error);
           });
       }
     });
   },
+  
+
 
   doLogin: (userData) => {
     return new Promise(async (resolve, rejectj) => {
@@ -212,41 +226,37 @@ module.exports = {
  
  
   //change the quantity of products from cart
-  changeCartQuantity: (details) => {
-    return new Promise((resolve, reject) => {
-      // let { cartId, productId, count, quantity } = productData;
-      details.count = parseInt( details.count);
-      details.quantity = parseInt( details.quantity);
-      if (details.count == -1 && details.quantity == 1) {
-        db.get()
-          .collection(collection.CART_COLLECTION)
-          .updateOne(
-            { _id: ObjectId(details.cart) },
-            {
-              $pull: { products: { item:ObjectId(details.product) } },
-            }
-          )
-          .then((response) => {
-            // console.log('item removed');
-            resolve({ removed: true });
-          });
+  changeCartQuantity: async ({ count, quantity, cart, product }) => {
+    try {
+      count = parseInt(count);
+      quantity = parseInt(quantity);
+  
+      if (count === -1 && quantity <= 1) {
+        await db.get().collection(collection.CART_COLLECTION).updateOne(
+          { _id: ObjectId(cart) },
+          { $pull: { products: { item: ObjectId(product) } } }
+        );
+  
+        return { removed: true };
       } else {
-        db.get().collection(collection.CART_COLLECTION)
-        .updateOne(
+        // Ensure quantity is always positive or zero
+        quantity = Math.max(quantity, 0);
+  
+        await db.get().collection(collection.CART_COLLECTION).updateOne(
           {
-            _id:ObjectId( details.cart),
-            'products.item':ObjectId( details.product)
+            _id: ObjectId(cart),
+            'products.item': ObjectId(product)
           },
-          {
-            $inc: {'products.$.quantity': details.count},
-          }
-        ).then((response )=>{
-          // console.log('incremented');
-          resolve({status:true})
-        });
+          { $set: { 'products.$.quantity': quantity + count } }
+        );
+  
+        return { status: true };
       }
-    });
+    } catch (error) {
+      throw error;
+    }
   },
+  
 
   //getting the count of cart items
   getCartCount:(userId)=>{
@@ -255,7 +265,6 @@ module.exports = {
       let cart= await db.get()
       .collection(collection.CART_COLLECTION)
       .findOne({userId:ObjectId(userId)});
-      console.log(cart);
       if(cart){
         console.log('conted');
         count=cart.products.length;
@@ -324,7 +333,7 @@ module.exports = {
           }
         ])
         .toArray();
-        console.log(total)
+        
       resolve(total[0]?.total);
     });
   },
@@ -465,64 +474,92 @@ module.exports = {
         reject('Cart is empty');
       }
     });
-  }  
-  ,
+  },
+
+  //add coupon details to cart
+  addCouponToCart: async (userId, couponCode) => {
+    try {
+      await db.get()
+        .collection(collection.CART_COLLECTION)
+        .updateOne(
+          { userId: ObjectId(userId) },
+          {
+            $set: { usedCouponCode: couponCode }
+          }
+        );
+    } catch (error) {
+      throw error;
+    }
+  },
+  
 
   //place the order
-  placeOrder: (order, address, products, totalPrice, user) => {
-    console.log("inside place order");
-    return new Promise(async (resolve, reject) => {
-      try {
-        const status = order['payment-option'] === 'COD' ? 'placed' : 'pending';  
-         
-        const randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let orderId = '';
-        for (let i = 0; i < 10; i++) {
-          const index = Math.floor(Math.random() * randomChars.length);
-          const char = randomChars.charAt(index);
-          orderId += char;
+  placeOrder: async (order, address, products, totalPrice, user, coupon) => {
+    try {
+      const status = order['payment-option'] === 'COD' ? 'placed' : 'pending';
+    
+      const randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let orderId = '';
+      for (let i = 0; i < 10; i++) {
+        const index = Math.floor(Math.random() * randomChars.length);
+        const char = randomChars.charAt(index);
+        orderId += char;
+      }
+  
+      const now = new Date().toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        dateStyle: "short"
+      });
+  
+      const orderObj = {
+        orderId: orderId,
+        deliveryDetails: {
+          mobile: address.phone,
+          address: address.billing_address,
+          city: address.city,
+          state: address.state,
+          zipcode: address.zipcode,
+        },
+        userId: ObjectId(address.userId),
+        userName: user.name,
+        paymentMethod: order['payment-option'],
+        products: products,
+        totalPrice: totalPrice,
+        status: status,
+        orderDate: now,
+        createdAt: new Date()
+      };
+  
+      const response = await db
+        .get()
+        .collection(collection.ORDER_COLLECTION)
+        .insertOne(orderObj);
+  
+      if (status === 'placed') {
+        if (coupon) {
+          await db.get()
+            .collection(collection.USER_COLLECTION)
+            .updateOne(
+              { _id: ObjectId(address.userId) },
+              {
+                $push: { usedCoupons: coupon }
+              }
+            );
         }
   
-        const now = new Date().toLocaleString("en-IN", {
-          timeZone: "Asia/Kolkata",
-          dateStyle: "short"
-        });
-        
-      
-        const orderObj = {
-          orderId: orderId,
-          deliveryDetails: {
-            mobile: address.phone,
-            address: address.billing_address,
-            city: address.city,
-            state: address.state,
-            zipcode: address.zipcode,
-          },
-          userId: ObjectId(address.userId),
-          userName:user.name,
-          paymentMethod: order['payment-option'],
-          products: products,
-          totalPrice: totalPrice,
-          status: status,
-          orderDate: now,
-          createdAt:new Date()
-        };      
-        
-        const response = await db
-          .get()
-          .collection(collection.ORDER_COLLECTION)
-          .insertOne(orderObj)
         await db
           .get()
           .collection(collection.CART_COLLECTION)
           .deleteOne({ userId: ObjectId(address.userId) });
-          console.log(response);
-        resolve(response.insertedId.toString());
-      } catch (error) {
-        reject(error);
       }
-    });
+  
+      console.log(response);
+      return response.insertedId.toString();
+    } catch (error) {
+      throw error;
+    }
   },
+  
   
 
   
@@ -546,7 +583,8 @@ module.exports = {
   }
   ,
 
-   paginate : ({ current, count, limit, url }) => {
+   
+  paginate : ({ current, count, limit, url }) => {
     const numPages = Math.ceil(count / limit);
     const pages = [];
     let i;
@@ -619,12 +657,52 @@ module.exports = {
       hmac.update(details['payment[razorpay_order_id]']+'|'+details['payment[razorpay_payment_id]']);
       hmac=hmac.digest('hex')
 
-      if(hmac==details['payment[razorpay_signature]']){
+      if(hmac==details['payment[razorpay_signature]']){ 
         resolve()
       }else{
         reject()
       }
     })
+  },
+
+  //push coupon to user collection for online paid
+  pushUsedCouponToUser: async (userId) => {
+    try {
+      const cart = await db.get()
+        .collection(collection.CART_COLLECTION)
+        .findOne({ userId: ObjectId(userId) });
+  
+      if (cart && cart.usedCouponCode) {
+        const couponCode = cart.usedCouponCode;
+  
+        const result = await db.get()
+          .collection(collection.USER_COLLECTION)
+          .updateOne(
+            { _id: ObjectId(userId) },
+            {
+              $push: { usedCoupons: couponCode }
+            }
+          );
+  
+        console.log('Result:', result);
+      }
+    } catch (error) {
+      throw error;
+    }
+  },
+  
+
+  //delete cart of user online paid
+  deleteCartOfOnlinePayment:async(userId)=>{
+    try{
+      await db.get()
+      .collection(collection.CART_COLLECTION)
+      .deleteOne({ userId: ObjectId(userId) })
+      return 
+    }catch(error){
+      console.log(error);
+      throw error
+    }
   },
 
   //change payment status after online payment
@@ -866,20 +944,64 @@ module.exports = {
   //find the user by userId
   getUserDetails:async(userId)=>{
     try{
-      let user=await db.get().collection(collection.USER_COLLECTION).findOne({_id:ObjectId(userId)})
+      let user=await db.get()
+      .collection(collection.USER_COLLECTION)
+      .findOne({_id:ObjectId(userId)})
       return user
     }catch(error){
       console.log(error);
       throw error
     }
   },
+  
+  //get the coupon applied by the user
+  getCouponUsed: async (userId) => {
+    try {
+      const cart = await db.get()
+        .collection(collection.CART_COLLECTION)
+        .findOne({ userId: ObjectId(userId) });
+  
+      if (cart && cart.usedCouponCode) {
+        return cart.usedCouponCode;
+      } else {
+        return null; 
+      }
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  removeCouponApplied:async(userId)=>{
+    try{
+      const cart=await db.get().collection(collection.CART_COLLECTION).findOne({userId:ObjectId(userId)})
+      console.log('caaart',cart);
+      if(cart && cart.usedCouponCode){
+        // Remove the coupon code from the user's cart and set the discount amount to null
+       let result= await db.get().collection(collection.CART_COLLECTION).updateOne(
+          { userId: ObjectId(userId) },
+          { $unset: { usedCouponCode: 1 }, $set: { discountedTotal: null } }
+        );
+        console.log('resulllt',result);
+        return true;
+      }else{
+        return false
+      }
+    }catch(error){
+      throw error
+    }
+  },
+  
 
   //set the discounted price in cart if coupon applied 
   discountedPrice: async (discountedTotal, userId) => {
     try {
-      let cart = await db.get().collection(collection.CART_COLLECTION).findOne({userId: ObjectId(userId)});
+      let cart = await db.get()
+      .collection(collection.CART_COLLECTION)
+      .findOne({userId: ObjectId(userId)});
       if (cart) {
-        let result = await db.get().collection(collection.CART_COLLECTION).updateOne(
+        let result = await db.get()
+        .collection(collection.CART_COLLECTION)
+        .updateOne(
           {userId: ObjectId(userId)},
           {$set: {discountedTotal: discountedTotal}}
         );
@@ -896,7 +1018,10 @@ module.exports = {
   //get the discounted price for the user who applied coupon
   getDiscountedTotal:async(userId)=>{
     try{
-      let cart=await db.get().collection(collection.CART_COLLECTION).find({userId:ObjectId(userId)}).toArray()
+      let cart=await db.get()
+      .collection(collection.CART_COLLECTION)
+      .find({userId:ObjectId(userId)})
+      .toArray()
       if(cart){
         return cart[0].discountedTotal;
       }else{

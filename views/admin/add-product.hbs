@@ -9,8 +9,7 @@
         <section class="content-main" style="height: auto;">
           <form action="/admin/add-product" method="post" enctype="multipart/form-data">
             <div class="row">
-                <div class="col-6">
-                  
+                <div class="col-6">                  
                       <div class="content-header">
                         <h2 class="content-title">Add New Product</h2>
                         <div>
@@ -36,16 +35,8 @@
                                         <label class="form-label">Description</label>
                                         <textarea placeholder="Type here" class="form-control" rows="3" name="product_description"></textarea>
                                     </div>
-                                    {{!-- <div class="mb-4">
-                                        <label class="form-label">Brand name</label>
-                                        <select class="form-select">
-                                            <option> Adidas </option>
-                                            <option> Nike </option>
-                                            <option> Puma </option>
-                                        </select>
-                                    </div> --}}
-                                </div> <!-- col.// -->
-                            </div> <!-- row.// -->
+                                </div> 
+                            </div>
                             <hr class="mb-4 mt-0">
                             <div class="row">
                                 <div class="col-md-3">
@@ -80,11 +71,12 @@
                                 </div>
                                 <div class="col-md-9">
                                     <div class="mb-4">
-                                        <label class="form-label">Images</label>
-                                        <input class="form-control" type="file" multiple name="images" value="upload">
+                                    <label class="form-label">Images</label>
+                                    <input class="form-control" id="imageInput" type="file" multiple name="images" value="upload">
                                     </div>
-                                </div> <!-- col.// -->
-                            </div> <!-- .row end// -->
+                                    <div id="imagePreview" class="row"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -93,3 +85,43 @@
          </form>
         </section> <!-- content-main end// -->
       </main>
+
+<script>
+  document.getElementById('imageInput').addEventListener('change', handleImageSelect);
+
+  let croppedImageData = []; // Array to store the cropped image data
+
+  function handleImageSelect(event) {
+    const files = event.target.files;
+    const imagePreviewContainer = document.getElementById('imagePreview');
+    imagePreviewContainer.innerHTML = '';
+
+    for (let i = 0; i < files.length; i++) {
+      const imagePreview = document.createElement('div');
+      imagePreview.classList.add('col-md-4');
+
+      const imagePreviewImg = document.createElement('img');
+      imagePreviewImg.src = URL.createObjectURL(files[i]);
+      imagePreviewImg.classList.add('img-fluid');
+      imagePreview.appendChild(imagePreviewImg);
+
+      const imagePreviewCanvas = document.createElement('canvas');
+      imagePreviewCanvas.classList.add('crop-canvas');
+      imagePreview.appendChild(imagePreviewCanvas);
+
+      imagePreviewContainer.appendChild(imagePreview);
+
+      const cropper = new Cropper(imagePreviewImg, {
+        aspectRatio: 1, // Set the aspect ratio as needed
+        crop(event) {
+          const croppedCanvas = cropper.getCroppedCanvas();
+          imagePreviewCanvas.width = croppedCanvas.width;
+          imagePreviewCanvas.height = croppedCanvas.height;
+          imagePreviewCanvas.getContext('2d').drawImage(croppedCanvas, 0, 0);
+          const croppedImageDataURL = imagePreviewCanvas.toDataURL(); // Get the cropped image data URL
+          croppedImageData[i] = croppedImageDataURL; // Store the cropped image data in the array
+        }
+      });
+    }
+  }
+</script>

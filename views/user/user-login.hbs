@@ -113,6 +113,8 @@
                                             <p class="error text-danger">{{loginErr}}</p>
                                           {{else if adminBlock}}
                                             <p class="error text-danger">{{adminBlock}}</p>
+                                          {{else if loggedOut}}
+                                            <p class="error text-danger">{{loggedOut}}</p>
                                           {{/if}}
                                             <div class="form-group">
                                                 <input type="text" id="email" required="" name="email" placeholder="Your Email">

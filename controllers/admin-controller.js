@@ -335,6 +335,19 @@ addCoupon:async(req,res)=>{
   }
 },
 
+//delete coupon
+deleteCoupon:async(req,res)=>{
+  try{
+    const { couponId } = req.body;
+    let response=adminHelper.deleteCoupon(couponId);
+    if(response){
+      res.status(200).json({ status: true })
+    }
+  }catch(error){
+    res.status(500).json({status:false,message: 'Failed to delete coupon' }) 
+  }
+},
+
 //get return request page
 getReturnRequest: async (req, res) => {
   try {

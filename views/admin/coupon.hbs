@@ -75,10 +75,10 @@
                                     
                                         <th>Sl.No</th>
                                         <th>Code</th>
-                                        <th>Discount</th>
+                                        <th>Discount %</th>
                                         <th>Description</th>
                                         {{!-- <th>Status</th> --}}
-                                        <th>Users Used</th>
+                                        {{!-- <th>Users Used</th> --}}
                                         <th>Max Limit </th>
                                         <th>Min Purchase required </th>
                                          <th class="text-center">Starting Date</th>
@@ -97,13 +97,13 @@
                                         <td>{{this.discountPercentage}} %</td>
                                         <td>{{this.description}}</td>
                                         {{!-- <td><span >{{#if this.isActive}}Active{{else}}Inactive{{/if}}</span></td> --}}
-                                         <td class="text-center">{{this.usersUsed.length}}</td>
+                                         {{!-- <td class="text-center">{{this.usersUsed.length}}</td> --}}
                                          <td>₹ {{ this.maxRedeemableAmount}}</td>
                                          <td>₹ {{ this.requiredMinPurchaseLimit}}</td>
                                          <td class="text-center">{{ this.startingDate}}</td>
                                          <td class="text-center">{{ this.expirationDate}}</td>
                                          <td class="text-end">
-                                            <button class="btn btn-light rounded btn-sm font-sm" onclick="alert('Are you sure you want to delete this coupon? This cannot be undone.');"
+                                            <button class="btn btn-light rounded btn-sm font-sm" onclick="deleteCoupon('{{this._id}}')"
                                             data-value="{{this._id}}" data-toggle="modal" data-target="#confirmDeleteCouponModal">Delete</button>
                                          </td>
 

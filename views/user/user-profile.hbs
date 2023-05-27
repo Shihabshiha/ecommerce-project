@@ -30,9 +30,6 @@
                                     <a class="nav-link" id="wallet-tab" data-bs-toggle="tab" href="#wallet" role="tab" aria-controls="wallet" aria-selected="false"><i class="fas fa-wallet mr-10"></i>Wallet</a>
                                   </li>
                                   <li class="nav-item">
-                                      <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>Account details</a>
-                                  </li>
-                                  <li class="nav-item">
                                       <a class="nav-link" href="page-login-register.html"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
                                   </li>
                               </ul>
@@ -56,101 +53,117 @@
                                           <h5 class="mb-0">Your Orders</h5>
                                       </div>
                                       <div class="card-body">
-                                          <div class="table-responsive">
-                                              <table class="table">
-                                                  <thead>
-                                                      <tr>
-                                                          <th>Order ID</th>
-                                                          <th>Date</th>
-                                                          <th>Status</th>
-                                                          <th>Total</th>
-                                                          <th>Actions</th>
-                                                      </tr>
-                                                  </thead>
-                                                  <tbody>
-                                                        {{#each orders}}
-                                                            <tr>
-                                                                <td>{{this.orderId}}</td>
-                                                                <td>{{this.orderDate}}</td>
-                                                                <td>{{this.status}}</td>
-                                                                <td>{{this.totalPrice}}</td>                                                                
-                                                                <td><a href="/order-details/{{this._id}}"class="btn-small d-block">View</a></td>
-                                                            </tr>
-                                                        {{/each}}
-                                                          
-                                                      
-                                                  </tbody>
-                                              </table>
-                                          </div>
-                                      </div>
+                                        {{#if orders.length}}
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Order ID</th>
+                                                        <th>Date</th>
+                                                        <th>Status</th>
+                                                        <th>Total</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {{#each orders}}
+                                                    <tr>
+                                                        <td>{{this.orderId}}</td>
+                                                        <td>{{this.orderDate}}</td>
+                                                        <td>{{this.status}}</td>
+                                                        <td>{{this.totalPrice}}</td>
+                                                        <td><a href="/order-details/{{this._id}}" class="btn-small d-block">View</a></td>
+                                                    </tr>
+                                                    {{/each}}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        {{else}}
+                                        <div class="text-center">
+                                            <h5>No orders found.</h5>
+                                            <p>You haven't placed any orders yet.</p>
+                                        </div>
+                                        {{/if}}
+                                    </div>
                                   </div>
                               </div>
-                                    <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
+                                <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
                                       <div class="row">
                                         
-                                        <div class="col-md-12 text-right mb-3">
+                                        <div class="col-md-12 ">
                                         
                                         <!-- Button trigger modal -->
-                                        <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#addAddressModal">Add Address</button>
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal">Add Address</button>
                                         </div>
                                         <!-- Modal -->
                                         <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="addAddressModalLabel">Add Address</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="addAddressModalLabel">Add Address</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form action="/add-address" method="post">
+                                                        <div class="form-group">
+                                                            <input type="text" name="billing_address" required="" placeholder="Address *">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <input type="text" name="billing_address2" required="" placeholder="Address line2">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <input required="" type="text" name="city" placeholder="City / Town *">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <input required="" type="text" name="state" placeholder="State / County *">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <input required="" type="text" name="zipcode" placeholder="Postcode / ZIP *">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <input required="" type="text" name="phone" placeholder="Phone *">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <input required="" type="text" name="email" placeholder="Email address *">
+                                                        </div>                                                
+                                                        <button type="submit" class="btn btn-primary">Save Address</button>
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="modal-body">
-                                                <form action="/add-address" method="post">
-                                                <div class="form-group">
-                                                    <input type="text" name="billing_address" required="" placeholder="Address *">
-                                                </div>
-                                                <div class="form-group">
-                                                    <input type="text" name="billing_address2" required="" placeholder="Address line2">
-                                                </div>
-                                                <div class="form-group">
-                                                    <input required="" type="text" name="city" placeholder="City / Town *">
-                                                </div>
-                                                <div class="form-group">
-                                                    <input required="" type="text" name="state" placeholder="State / County *">
-                                                </div>
-                                                <div class="form-group">
-                                                    <input required="" type="text" name="zipcode" placeholder="Postcode / ZIP *">
-                                                </div>
-                                                <div class="form-group">
-                                                    <input required="" type="text" name="phone" placeholder="Phone *">
-                                                </div>
-                                                <div class="form-group">
-                                                    <input required="" type="text" name="email" placeholder="Email address *">
-                                                </div>                                                
-                                                <button type="submit" class="btn btn-primary">Save Address</button>
-                                                </form>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            </div>
-                                            </div>
-                                        </div>
                                         </div>  
                                                                                                
-                                    </div>
+                                      </div>
                                     <!-- Address List -->
-                                    <div class="row">
-                                    {{#each address}}
-                                    <div class="col-md-4 mb-3">
-                                        <div class="card">
-                                        <div class="card-body">
-                                            <h5 class="card-title">{{billing_address}}</h5>
-                                            <p class="card-text">{{city}}, {{state}} {{zipcode}}</p>
-                                            <p class="card-text">{{phone}}</p>
-                                            <a href="/edit-address/{{this._id}}" class="btn btn-outline-primary btn-sm edit">Edit</a>
-                                            <a onclick="return deleteAddress('{{this._id}}');" class="btn btn-outline-danger btn-sm delete">Delete</a>
+                                         <div class="row">
+                                            {{#if address.length}}
+                                            {{#each address}}
+                                            <div class="col-md-4 mb-3">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">{{billing_address}}</h5>
+                                                        <p class="card-text">{{city}}, {{state}} {{zipcode}}</p>
+                                                        <p class="card-text">{{phone}}</p>
+                                                        <a href="/edit-address/{{this._id}}" class="btn btn-outline-primary btn-sm edit">Edit</a>
+                                                        <a onclick="return deleteAddress('{{this._id}}');" class="btn btn-outline-danger btn-sm delete">Delete</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {{/each}}
+                                            {{else}}
+                                            <div class="col-md-12">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">No addresses found.</h5>
+                                                        <p class="card-text">You haven't added any addresses yet.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {{/if}}
                                         </div>
-                                        </div>
-                                    </div>
-                                    {{/each}}
-                                    </div>
 
 
                                 </div>
@@ -168,79 +181,39 @@
                                   <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="wallet-transactions" class="form-label fs-5">Recent Transactions</label>
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Sl.No</th>
-                                                    <th scope="col">Transaction Type</th>
-                                                    <th scope="col">Amount</th>
-                                                    <th scope="col">Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {{#each wallet.transactions}}
-                                                <tr>
-                                                    <td>{{inc @index}}</td>
-                                                    <td>{{this.type}}</td>
-                                                    <td>{{this.amount}}</td>
-                                                    <td>{{formatDate this.date}}</td>
-                                                </tr>
-                                                {{/each}}
-                                            </tbody>
-                                        </table>
+                                        {{#if wallet.transactions.length}}
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Sl.No</th>
+                                                        <th scope="col">Transaction Type</th>
+                                                        <th scope="col">Amount</th>
+                                                        <th scope="col">Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {{#each wallet.transactions}}
+                                                    <tr>
+                                                        <td>{{inc @index}}</td>
+                                                        <td>{{this.type}}</td>
+                                                        <td>{{this.amount}}</td>
+                                                        <td>{{formatDate this.date}}</td>
+                                                    </tr>
+                                                    {{/each}}
+                                                </tbody>
+                                            </table>
+                                            {{else}}
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">No transactions found.</h5>
+                                                    <p class="card-text">You haven't made any transactions yet.</p>
+                                                </div>
+                                            </div>
+                                            {{/if}}
                                     </div>
-                                </div>
-
-
-
-                                </div>
-                            </div>
-
-                              <div class="tab-pane fade" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
-                                  <div class="card">
-                                      <div class="card-header">
-                                          <h5>Account Details</h5>
-                                      </div>
-                                      <div class="card-body">
-                                          <p>Already have an account? <a href="page-login-register.html">Log in instead!</a></p>
-                                          <form method="post" name="enq">
-                                              <div class="row">
-                                                  <div class="form-group col-md-6">
-                                                      <label>First Name <span class="required">*</span></label>
-                                                      <input required="" class="form-control square" name="name" type="text">
-                                                  </div>
-                                                  <div class="form-group col-md-6">
-                                                      <label>Last Name <span class="required">*</span></label>
-                                                      <input required="" class="form-control square" name="phone">
-                                                  </div>
-                                                  <div class="form-group col-md-12">
-                                                      <label>Display Name <span class="required">*</span></label>
-                                                      <input required="" class="form-control square" name="dname" type="text">
-                                                  </div>
-                                                  <div class="form-group col-md-12">
-                                                      <label>Email Address <span class="required">*</span></label>
-                                                      <input required="" class="form-control square" name="email" type="email">
-                                                  </div>
-                                                  <div class="form-group col-md-12">
-                                                      <label>Current Password <span class="required">*</span></label>
-                                                      <input required="" class="form-control square" name="password" type="password">
-                                                  </div>
-                                                  <div class="form-group col-md-12">
-                                                      <label>New Password <span class="required">*</span></label>
-                                                      <input required="" class="form-control square" name="npassword" type="password">
-                                                  </div>
-                                                  <div class="form-group col-md-12">
-                                                      <label>Confirm Password <span class="required">*</span></label>
-                                                      <input required="" class="form-control square" name="cpassword" type="password">
-                                                  </div>
-                                                  <div class="col-md-12">
-                                                      <button type="submit" class="btn btn-fill-out submit" name="submit" value="Submit">Save</button>
-                                                  </div>
-                                              </div>
-                                          </form>
-                                      </div>
                                   </div>
                               </div>
+                            </div>
                           </div>
                       </div>
                   </div>

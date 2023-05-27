@@ -140,6 +140,8 @@ module.exports = {
     });
   },
 
+
+
   //get all category and show to admin
   getAllCategory: async() => {
       try {
@@ -305,6 +307,19 @@ module.exports = {
       return coupons
     }catch(error){
       console.log(error)
+      throw error
+    }
+  },
+
+  //delete coupon
+  deleteCoupon:async(couponId)=>{
+    try{
+      let result=db.get()
+      .collection(collection.COUPON_COLLECTION)
+      .deleteOne({ _id: ObjectId(couponId) })
+      return result
+    }catch(error){
+      console.log(error);
       throw error
     }
   },

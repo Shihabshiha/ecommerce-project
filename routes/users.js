@@ -39,15 +39,15 @@ router.route('/user-logout')
 
 //shop page loading
 router.route('/shop-page')
-.get(session_check.userCheck, pageController.shopPage);
+.get( pageController.shopPage);
 
 //search products
 router.route('/search-product')
-.get(session_check.userCheck,pageController.searchProducts);
+.get(pageController.searchProducts);
 
 //category wise page 
 router.route('/category-page/:id')
-.get(session_check.userCheck, pageController.CategoryFilterPage)
+.get( pageController.CategoryFilterPage)
 
 //User profile page render
 router.route('/user-profile')                   
@@ -67,11 +67,11 @@ router.route('/deleteAddress').post(userController.deleteAddressbyId)
 
 //Product detail page render
 router.route('/product-details/:id')
-.get(session_check.userCheck,pageController.productDetails)
+.get(pageController.productDetails)
 
 
 //add items to cart
-router.post('/add-to-cart',userController.addtoCart)
+router.post('/add-to-cart', userController.addtoCart)
 
 //view the cart
 router.route('/view-cart')
@@ -88,9 +88,15 @@ router.route('/removeProduct')
 //checkout page loading
 router.route('/check-out')
 .get(session_check.userCheck,userController.getCheckoutPage)
-
-
 router.post('/check-out-post',userController.postCheckout)
+
+//add new address
+router.route('/add-new-address')
+.post(userController.addNewAddress);
+
+// verify the razorpay payment
+router.route('/verify-payment')
+.post(userController.verifyPayment)
 
 //order placed successfully page
 router.route('/order-placed')
@@ -105,11 +111,6 @@ router.route('/order-list')
 
 
 
-// verify the razorpay payment
-router.route('/verify-payment')
-.post(userController.verifyPayment)
-
-
 //order details
 router.route('/order-details/:id')
 .get(session_check.userCheck,userController.orderDetails);
@@ -117,6 +118,7 @@ router.route('/order-details/:id')
 //to get available coupon for a purchase
 router.route('/coupons').get(userController.getCoupons);
 router.route('/apply-coupon').post(userController.applyCoupon)
+router.route('/remove-coupon').post(userController.removeCouponApplied);
 
 //return item by user
 router.route('/returnItem').post(userController.returnItemByUser)

@@ -11,12 +11,12 @@ module.exports ={
 homePage: async (req, res, next) => {
   try {
     let user = req.session.user;
-    let cartCount = null;
+    let cartCount = 0;
     if (user) {
       cartCount = await userHelper.getCartCount(user._id)
     }
-    res.render('index', { user, "loggedOut": req.session.loggedOut, cartCount });
-    req.session.loggedOut = false;
+    res.render('index', { user, cartCount });
+    
   } catch (error) {
     next(error);
   }
@@ -25,10 +25,16 @@ homePage: async (req, res, next) => {
 // user login page load  
 loginPage: (req, res) => {
   try {
-    res.render('user/user-login', { "loginErr": req.session.loginErr, "adminBlock": req.session.adminBlock });
+    res.render('user/user-login',
+     { "loginErr": req.session.loginErr,
+       "loggedOut": req.session.loggedOut,
+       "adminBlock": req.session.adminBlock 
+     });
     req.session.loginErr = false
     req.session.adminBlock = false
+    req.session.loggedOut = false;
   } catch (error) {
+    console.log('errror in loading login page');
     next(error);
   }
 },
@@ -141,6 +147,7 @@ signupPost: (req,res)=>{
   try {
     userHelper.doSignup(req.body).then((data)=>{
       req.session.user=data
+      console.log('user data',req.session.user)
       res.redirect('/')
     }).catch((Err)=>{
       res.render('user/user-signup',{exists:true})
@@ -156,7 +163,7 @@ userLogout:(req,res)=>{
     req.session.user=null;
     req.session.loginStatus=false;
     req.session.loggedOut="Successfully logged out"
-    res.redirect('/')
+    res.redirect('/user-login')
   } catch (error) {
     res.status(500).send('Internal server error');
   }
@@ -167,11 +174,15 @@ addtoCart:(req,res)=>{
   try {
     let { productId } = req.body;
     let user=req.session.user;
-    let userId=user._id;
-    if(user){
+    let userId = user ? user._id : null;
+    if( userId){
       userHelper.addToUserCart(userId,productId).then(()=>{
         res.json({ status: true })
+      }).catch(()=>{
+        res.status(500).send('Internal server error');
       })
+    }else{
+      res.json({message:"User not logged in"})
     }
   } catch (error) {
     res.status(500).send('Internal server error');
@@ -193,18 +204,19 @@ viewCart: async (req, res) => {
 },
 
 // Change the quantity of product in cart
-changeCartProductQuantity: (req, res) => {
+changeCartProductQuantity: async (req, res) => {
   try {
-    userHelpers.changeCartQuantity(req.body).then(async(response) => {
-      console.log('change qty',req.body);
-      response.total=await userHelper.getTotalAmount(req.body.user);
-      response.subtotal = await userHelpers.findSubTotal(req.body.user)
-      res.json(response);
-    });
+    const response = await userHelper.changeCartQuantity(req.body);
+    response.total = await userHelper.getTotalAmount(req.body.user);
+    // response.subtotal = await userHelper.findSubTotal(req.body.user);
+    console.log(response);
+    res.json(response);
   } catch (error) {
+    console.error(error);
     res.status(500).send('Internal server error');
   }
 },
+
 
 
 // Remove products from cart
@@ -217,6 +229,36 @@ removeProductFromCart:(req,res)=>{
     res.status(500).send('Internal server error');
   }
 },
+
+
+// Remove the applied coupon
+// Remove the applied coupon
+removeCouponApplied: async (req, res) => {
+  try {
+    let userId = req.session.user._id;
+    let success = await userHelper.removeCouponApplied(userId);
+    console.log('remoooo',success);
+    if (success) {
+      // Calculate the updated total
+      let total = await userHelper.getTotalAmount(userId);
+
+      res.json({
+        success: true,
+        message: 'Coupon removed successfully',
+        total: total
+      });
+    } else {
+      res.json({
+        success: false,
+        message: 'Coupon not found or already removed'
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+},
+
+
 
 // Checkout page rendering
 getCheckoutPage:async(req,res)=>{
@@ -315,8 +357,33 @@ deleteAddressbyId: async (req, res) => {
     console.error(error);
     res.status(500).json({ status: false, message: 'An error occurred while deleting address' });
   }
-}
-,
+},
+
+//add new address
+addNewAddress: async (req, res) => {
+  try {
+    const userId=req.session.user._id;
+    const { billing_address, billing_address2, city, state, zipcode, phone, email } = req.body;
+    const savedAddress = await userHelper.addUserAddress({
+      billing_address,
+      billing_address2,
+      city,
+      state,
+      zipcode,
+      phone,
+      email,
+      userId
+    });
+
+    if (savedAddress) {
+      return res.status(200).json({ success: true, message: 'Address saved successfully' });
+    } else {
+      return res.status(500).json({ success: false, message: 'Error saving address' });
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Error saving address' });
+  }
+},
 
 // post checkout and placing the order
   postCheckout:async(req,res)=>{
@@ -325,12 +392,13 @@ deleteAddressbyId: async (req, res) => {
     let userId=req.session.user._id;
     let user=req.session.user;
     const address=await userHelper.getDeliveryAddress(req.body.addressId);
+    const coupon=await userHelper.getCouponUsed(userId);
     const products=await userHelper.getCartProductsList(userId);
     const totalCartPrice=await userHelper.getTotalAmount(userId);
     const discountedTotal=await userHelper.getDiscountedTotal(userId);
     const totalPrice = discountedTotal ? discountedTotal : totalCartPrice;
     console.log("working until here");
-    userHelper.placeOrder(req.body,address,products,totalPrice,user).then((orderId)=>{
+    userHelper.placeOrder(req.body,address,products,totalPrice,user,coupon).then((orderId)=>{
       if(req.body['payment-option']=='COD'){
         res.json({codSuccess:true})
       }else{
@@ -387,7 +455,10 @@ getOrderList: async (req, res) => {
  verifyPayment : (req, res) => {
   try {
     console.log(req.body);
+    let userId=req.session.user._id;
     userHelper.verifyPayment(req.body).then(() => {
+      userHelper.pushUsedCouponToUser(userId);
+      userHelper.deleteCartOfOnlinePayment(userId);
       userHelper.changePaymentStatus(req.body['order[receipt]']).then(() => {
         console.log('Payment successful');
         res.json({ status: true });
@@ -486,12 +557,10 @@ applyCoupon:async(req,res)=>{
   try{
     const userId=req.session.user._id
     const {couponCode:couponCode}=req.body;
-    console.log('our',userId);
     console.log(couponCode);
     let totalAmount=await userHelper.getTotalAmount(userId);
     const coupon= await userHelper.getCouponDetails(couponCode);
-    console.log(coupon);
-
+    
     // If coupon not found, return an error message
     if(!coupon){
       return res.status(400).json({error: 'Invalid coupon code'})
@@ -523,7 +592,9 @@ applyCoupon:async(req,res)=>{
      }
 
     // Add the coupon code to the user's used coupons array
-    await userHelper.pushCouponToUser(userId,couponCode);
+    // await userHelper.pushCouponToUser(userId,couponCode);
+    //add coupon details to cart
+    await userHelper.addCouponToCart(userId,couponCode)
 
     let discountedTotal= totalAmount-discountAmount;
     await userHelper.discountedPrice(discountedTotal,userId);
