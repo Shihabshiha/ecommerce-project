@@ -397,7 +397,6 @@ addNewAddress: async (req, res) => {
     const totalCartPrice=await userHelper.getTotalAmount(userId);
     const discountedTotal=await userHelper.getDiscountedTotal(userId);
     const totalPrice = discountedTotal ? discountedTotal : totalCartPrice;
-    console.log("working until here");
     userHelper.placeOrder(req.body,address,products,totalPrice,user,coupon).then((orderId)=>{
       if(req.body['payment-option']=='COD'){
         res.json({codSuccess:true})
